@@ -1,0 +1,17 @@
+.idea/
+.vscode/
+
+# Virtual env
+venv/
+
+# env file
+.env
+# Cache
+__pycache__/
+*.pyc
+.mypy_cache
+
+*.env
+
+__pycache__
+srs/src
