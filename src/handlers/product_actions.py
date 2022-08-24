@@ -1,7 +1,7 @@
 from main import dp
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import KeyboardButton, Message, ReplyKeyboardRemove
 
 from states import ProductEdit, ProductRemove
 from storages import cur, conn
@@ -49,45 +49,73 @@ async def process_pr_2(message: Message, state: FSMContext):
         async with state.proxy() as data:
             data['description'] = message.text
         kb = akbb()
+        kb.row(KeyboardButton(text="Нет фотографий"))
         await ProductEdit.next()
         await message.answer(f'Загрузите фото', reply_markup=kb)
 
 
-@dp.message_handler(content_types=['photo'], state=ProductEdit.add_photo)
+@dp.message_handler(content_types=['photo', 'text'], state=ProductEdit.add_photo)
 async def process_pr_3(message: Message, state: FSMContext):
-    if message.text.startswith('Отмена'):
-        kb = akb1()
-        await message.answer('Действие отменено.\nМеню Админимстратора', reply_markup=kb)
-        await state.finish()
-    else:
+
+    if message['photo']:
         async with state.proxy() as data:
             data['photo'] = message.photo[0].file_id
         kb = akbb()
+        kb.row(KeyboardButton(text="Нет инструкций"))
+        await ProductEdit.next()
+        await message.answer(f'Добавьте файл с инструкцией', reply_markup=kb)
+    elif message.text and message.text.startswith('Нет фотографий'):
+        async with state.proxy() as data:
+            data['photo'] = message.text
+        kb = akbb()
+        kb.row(KeyboardButton(text="Нет инструкций"))
         await ProductEdit.next()
         await message.answer(f'Добавьте файл с инструкцией', reply_markup=kb)
 
-
-@dp.message_handler(content_types=['document'], state=ProductEdit.add_file)
-async def process_pr_4(message: Message, state: FSMContext):
-    if message.text.startswith('Отмена'):
+    elif message.text and message.text.startswith('Отмена'):
         kb = akb1()
         await message.answer('Действие отменено.\nМеню Админимстратора', reply_markup=kb)
         await state.finish()
     else:
+        kb = akb1()
+        await message.answer('Неизвестное действие со стороны пользователя.\n<b>Меню Админимстратора</b>',
+                             reply_markup=kb)
+        await state.finish()
+
+
+@dp.message_handler(content_types=['document', 'text'], state=ProductEdit.add_file)
+async def process_pr_4(message: Message, state: FSMContext):
+
+    if message['document']:
+
         async with state.proxy() as data:
             data['file'] = message.document.file_id
         kb = akbb()
+        kb.row(KeyboardButton(text="Нет видео"))
         await ProductEdit.next()
         await message.answer(f'Добавьте видео', reply_markup=kb)
 
-
-@dp.message_handler(content_types=['video'], state=ProductEdit.add_video)
-async def process_pr_5(message: Message, state: FSMContext):
-    if message.text.startswith('Отмена'):
+    elif message.text and message.text.startswith('Нет инструкций'):
+        async with state.proxy() as data:
+            data['file'] = message.text
+        kb = akbb()
+        kb.row(KeyboardButton(text="Нет видео"))
+        await ProductEdit.next()
+        await message.answer(f'Добавьте видео', reply_markup=kb)
+    elif message.text and message.text.startswith('Отмена'):
         kb = akb1()
         await message.answer('Действие отменено.\nМеню Админимстратора', reply_markup=kb)
         await state.finish()
     else:
+        kb = akb1()
+        await message.answer('Неизвестное действие со стороны пользователя.\n<b>Меню Админимстратора</b>', reply_markup=kb)
+        await state.finish()
+
+
+@dp.message_handler(content_types=['video', 'text'], state=ProductEdit.add_video)
+async def process_pr_5(message: Message, state: FSMContext):
+
+    if message['video']:
         async with state.proxy() as data:
             data['video'] = message.video.file_id
         kb = akb1()
@@ -98,6 +126,27 @@ async def process_pr_5(message: Message, state: FSMContext):
             conn.commit()
         await state.finish()
         await message.answer(f'Товар зарегистрирован', reply_markup=kb)
+    elif message.text and message.text.startswith('Нет видео'):
+        async with state.proxy() as data:
+            data['video'] = message.text
+        kb = akb1()
+        async with state.proxy() as data:
+            cur.execute(f"""INSERT INTO products(name, description, photo_id, file_id, video_id)
+                                                        VALUES('{data['name']}', '{data['description']}',
+                                                        '{data['photo']}', '{data['file']}', '{data['video']}');""")
+            conn.commit()
+        await state.finish()
+        await message.answer(f'Товар зарегистрирован', reply_markup=kb)
+
+    elif message.text and message.text.startswith('Отмена'):
+        kb = akb1()
+        await message.answer('Действие отменено.\nМеню Админимстратора', reply_markup=kb)
+        await state.finish()
+    else:
+        kb = akb1()
+        await message.answer('Неизвестное действие со стороны пользователя.\n<b>Меню Админимстратора</b>',
+                             reply_markup=kb)
+        await state.finish()
 
 
 @dp.message_handler(Text(equals='Удалить товар'))
@@ -108,7 +157,7 @@ async def remove_pr(message: Message):
     await message.answer('Введите название товара для удаления (например стринги женские)', reply_markup=kb)
 
 
-@dp.message_handler(state = ProductRemove.remove_product)
+@dp.message_handler(state=ProductRemove.remove_product)
 async def procecc_rem_pr1(message: Message, state: FSMContext):
     kb = akb1()
     if message.text.startswith('Отмена'):

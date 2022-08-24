@@ -4,7 +4,7 @@ from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardBut
                         KeyboardButton, Message, ReplyKeyboardMarkup
 
 from main import dp
-from utility import  check_users, hkb, random_em
+from utility import check_users, hkb, random_em
 from states import ClientDialog
 from storages import cur
 
@@ -15,7 +15,7 @@ async def cmd_link(message: Message):
     product_obj = cur.fetchall()
     products = list(map(lambda x: x[0], product_obj))
     buttons = [KeyboardButton(text=f"{p} {random_em()}") for p in products]
-    kb = ReplyKeyboardMarkup(row_width=3, one_time_keyboard=True)
+    kb = ReplyKeyboardMarkup(row_width=3, resize_keyboard=True, one_time_keyboard=True)
     kb.add(*buttons)
     kb.add("Отмена 🔙")
     await ClientDialog.client_choose.set()
@@ -48,28 +48,44 @@ async def process_vpr_1(message: Message, state: FSMContext):
             ikb.row(InlineKeyboardButton(text="Вернуться к просмотру товаров", callback_data="call_view_products"))
 
             await state.finish()
-            await message.answer_photo(photo=data[1], caption=f'<b>{p}</b>\n<i>Описание</i>: {data[0][:900]}', reply_markup=ikb)
-            # await message.answer(text=f'Описание: {data[0]}', reply_markup=ikb)
+            if data[1] != "Нет фотографий":
+                await message.answer_photo(photo=data[1], caption=f'<b>{p}</b>\n<i>Описание</i>: {data[0][:900]}',
+                                           reply_markup=ikb)
+            if data[1] == "Нет фотографий":
+                await message.answer(text=f'<b>{data[1]}</b>\n<b>{p}</b>\n<i>Описание</i>: {data[0][:900]}',
+                                           reply_markup=ikb)
 
 
 @dp.callback_query_handler(text="call_instruction", )
 async def products_instr(call: CallbackQuery, ):
     ikb = InlineKeyboardMarkup()
     ikb.row(InlineKeyboardButton(text="Вернуться к просмотру товаров", callback_data="call_view_products"))
-    p = call.message.caption.split('\n')[0]
+    if call.message.caption:
+        p = call.message.caption.split('\n')[0]
+    if call.message.text:
+        p = call.message.text.split('\n')[1]
     cur.execute(f"SELECT file_id FROM products WHERE name='{p}'")
     data = cur.fetchone()[0]
-    await call.message.answer_document(document=data, caption="<b>Инструкция</b> по эксплуатации", reply_markup=ikb)
+    if data != "Нет инструкций":
+        await call.message.answer_document(document=data, caption="<b>Инструкция</b> по эксплуатации", reply_markup=ikb)
+    if data == "Нет инструкций":
+        await call.message.answer(text=f"<b>{data}</b>", reply_markup=ikb)
 
 
 @dp.callback_query_handler(text="call_product_video", )
 async def products_video(call: CallbackQuery,):
     ikb = InlineKeyboardMarkup()
     ikb.row(InlineKeyboardButton(text="Вернуться к просмотру товаров", callback_data="call_view_products"))
-    p = call.message.caption.split('\n')[0]
+    if call.message.caption:
+        p = call.message.caption.split('\n')[0]
+    if call.message.text:
+        p = call.message.text.split('\n')[1]
     cur.execute(f"SELECT video_id FROM products WHERE name='{p}'")
     data = cur.fetchone()[0]
-    await call.message.answer_video(video=data, caption="<b>Видеообзор</>", reply_markup=ikb)
+    if data != "Нет видео":
+        await call.message.answer_video(video=data, caption="<b>Видеообзор</>", reply_markup=ikb)
+    if data == "Нет видео":
+        await call.message.answer(text=f"<b>{data}</>", reply_markup=ikb)
 
 
 @dp.callback_query_handler(text="call_view_products")
