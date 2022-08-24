@@ -27,7 +27,7 @@ async def add_pr(message: Message):
 
 @dp.message_handler(state=ProductEdit.add_product)
 async def process_pr_1(message: Message, state: FSMContext):
-    if message.text == 'Отмена 🔙':
+    if message.text.startswith('Отмена'):
         kb = akb1()
         await message.answer('Действие отменено.\nМеню Админимстратора', reply_markup=kb)
         await state.finish()
@@ -41,7 +41,7 @@ async def process_pr_1(message: Message, state: FSMContext):
 
 @dp.message_handler(state=ProductEdit.add_description)
 async def process_pr_2(message: Message, state: FSMContext):
-    if message.text == 'Отмена 🔙':
+    if message.text.startswith('Отмена'):
         kb = akb1()
         await message.answer('Меню Админимстратора', reply_markup=kb)
         await state.finish()
@@ -55,7 +55,7 @@ async def process_pr_2(message: Message, state: FSMContext):
 
 @dp.message_handler(content_types=['photo'], state=ProductEdit.add_photo)
 async def process_pr_3(message: Message, state: FSMContext):
-    if message.text == 'Отмена 🔙':
+    if message.text.startswith('Отмена'):
         kb = akb1()
         await message.answer('Действие отменено.\nМеню Админимстратора', reply_markup=kb)
         await state.finish()
@@ -69,7 +69,7 @@ async def process_pr_3(message: Message, state: FSMContext):
 
 @dp.message_handler(content_types=['document'], state=ProductEdit.add_file)
 async def process_pr_4(message: Message, state: FSMContext):
-    if message.text == 'Отмена 🔙':
+    if message.text.startswith('Отмена'):
         kb = akb1()
         await message.answer('Действие отменено.\nМеню Админимстратора', reply_markup=kb)
         await state.finish()
@@ -83,7 +83,7 @@ async def process_pr_4(message: Message, state: FSMContext):
 
 @dp.message_handler(content_types=['video'], state=ProductEdit.add_video)
 async def process_pr_5(message: Message, state: FSMContext):
-    if message.text == 'Отмена 🔙':
+    if message.text.startswith('Отмена'):
         kb = akb1()
         await message.answer('Действие отменено.\nМеню Админимстратора', reply_markup=kb)
         await state.finish()
@@ -111,7 +111,7 @@ async def remove_pr(message: Message):
 @dp.message_handler(state = ProductRemove.remove_product)
 async def procecc_rem_pr1(message: Message, state: FSMContext):
     kb = akb1()
-    if message.text == "Отмена 🔙":
+    if message.text.startswith('Отмена'):
         await state.finish()
         await message.answer("Действие отменено.\nМеню администратора", reply_markup=kb)
     else:
