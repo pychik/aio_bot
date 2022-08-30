@@ -2,6 +2,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardBut
 from secrets import choice
 from config import settings
 
+
+# hello keyboard
 def hkb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     kb_buttons = ["Выбрать товар 🛍️", "Техподдержка/Отзывы 🤩"]
@@ -9,14 +11,16 @@ def hkb():
     return kb
 
 
+# choosing what we do with sku
 def akb1():
     akb = ReplyKeyboardMarkup(resize_keyboard=True)
-    akb.row(KeyboardButton(text="Все товары"))
-    akb.row(KeyboardButton(text="Добавить товар"), KeyboardButton(text="Удалить товар"))
+    akb.row(KeyboardButton(text="Все товары"), KeyboardButton(text="Добавить товар"),)
+    akb.row(KeyboardButton(text="Редактировать товар"), KeyboardButton(text="Удалить товар"))
     akb.row(KeyboardButton(text="Назад в главное меню 👈"))
     return akb
 
 
+# choosing what we do with sku
 def akb2():
     akb = ReplyKeyboardMarkup(resize_keyboard=True)
     akb.row(KeyboardButton(text="Все товары"))
@@ -25,6 +29,16 @@ def akb2():
     return akb
 
 
+# editing sku
+def akb3():
+    akb = ReplyKeyboardMarkup(resize_keyboard=True)
+    akb.row(KeyboardButton(text="Ред. описание"), KeyboardButton(text="Ред. фото"))
+    akb.row(KeyboardButton(text="Ред. инструкцию"), KeyboardButton(text="Ред. видео"))
+    akb.row(KeyboardButton(text="Отмена 🔙"))
+    return akb
+
+
+# keybord back
 def akbb():
     akb = ReplyKeyboardMarkup(resize_keyboard=True)
     akb.row(KeyboardButton(text="Отмена 🔙"))

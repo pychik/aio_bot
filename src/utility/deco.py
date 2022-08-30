@@ -4,18 +4,6 @@ from .keyboards import akb1, hkb
 from config import settings
 from main import bot
 
-# def user_check(func):
-#     @wraps(func)
-#     async def wrap(message, *args, **kwargs):
-#         cur.execute(f"SELECT COUNT(*) FROM admins WHERE username='{message.from_user.username}'")
-#         d = cur.fetchone()[0]
-#         if d == 0:
-#             kb = hkb()
-#             await message.answer('Ты не администратор!', reply_markup=kb)
-#         else:
-#             return await func(message, *args, **kwargs)
-#     return wrap
-
 
 def user_check(func):
     @wraps(func)

@@ -1,15 +1,11 @@
 import logging as log
-from aiogram import Bot, Dispatcher, executor, types # импортируем aiogram
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from config import settings
 
 
 log.basicConfig(level=log.INFO)  # Initialize bot and dispatcher
 bot = Bot(token=settings.API_TOKEN, parse_mode=types.ParseMode.HTML)
-# storage = MemoryStorage()
-# и т.д.
-
 
 storage = RedisStorage2(
     host=settings.REDIS_HOST,

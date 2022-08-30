@@ -14,4 +14,9 @@ __pycache__/
 *.env
 
 __pycache__
+__pycache__/
 srs/src
+src/token
+src/storages/__pycache__/
+src/utility/__pycache__/
+src/handlers/__pycache__/
